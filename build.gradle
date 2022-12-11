@@ -1,0 +1,116 @@
+plugins {
+    id "dev.architectury.loom" version "0.11.0-SNAPSHOT"
+    id 'java'
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = 17
+
+archivesBaseName = rootProject.archives_base_name
+version = rootProject.mod_version
+group = rootProject.maven_group
+
+loom {
+    silentMojangMappingsLicense()
+
+    forge {
+        mixinConfigs = ["ExtrasForFTB.mixins.json"]
+
+        dataGen {
+            mod project.mod_id
+        }
+
+        launches {
+            data {
+                arg "--existing", file("src/main/resources").absolutePath
+            }
+        }
+    }
+}
+
+repositories {
+    maven {
+        url "https://maven.architectury.dev/"
+        content {
+            includeGroup "dev.architectury"
+            includeGroup "me.shedaniel"
+            includeGroup "me.shedaniel.cloth"
+        }
+    }
+
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+
+    maven {
+        url "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.ftb.mods"
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+
+    forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+
+    // also pulls in architectury
+    modImplementation("dev.ftb.mods:ftb-library-forge:${rootProject.ftb_library_version}") {
+        exclude module: 'me.shedaniel:RoughlyEnoughItems-forge'
+    }
+
+    modImplementation "dev.ftb.mods:ftb-ranks-forge:${rootProject.ftb_ranks_version}"
+
+    modImplementation "dev.ftb.mods:ftb-essentials:${rootProject.ftb_essentials_version}"
+
+    modImplementation "dev.ftb.mods:ftb-chunks-forge:${rootProject.ftb_chunks_version}"
+
+    modImplementation "dev.ftb.mods:ftb-teams-forge:${rootProject.ftb_teams_version}"
+
+    compileOnly 'net.luckperms:api:5.4'
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+
+    manifest {
+        attributes([
+                "Specification-Title"     : project.mod_id,
+                "Specification-Vendor"    : project.mod_author,
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : version,
+                "Implementation-Vendor"   : project.mod_author,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}

@@ -1,0 +1,10 @@
+pluginManagement {
+    repositories {
+        maven { url "https://maven.creeperhost.net/" }
+        maven { url "https://maven.shedaniel.me/" }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'Extras-For-FTB-1.18.2'

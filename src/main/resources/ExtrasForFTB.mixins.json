@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.github.org.projectnova.extrasforftb.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "extrasforftb.refmap.json",
+  "mixins": [
+    "ftbessentials.config.ExtrasForFTBPermissionBasedIntValue",
+    "ftbchunks.ExtrasForFTBChunksWorldConfig"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

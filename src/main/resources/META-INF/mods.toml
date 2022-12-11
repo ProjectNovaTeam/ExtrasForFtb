@@ -1,0 +1,85 @@
+modLoader = "javafml"
+loaderVersion = "[40,)"
+license = "GNU GPL 3.0"
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="http://my.issue.tracker/"
+[[mods]]
+modId = "extrasforftb"
+version = "${version}"
+displayName = "ExtrasForFTB"
+# A URL to query for updates for this mod. See the JSON update specification <here>
+#updateJSONURL="http://myurl.me/" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="http://example.com/" #optional
+# A file name (in the root of the mod JAR) containing a logo for display
+#logoFile="ExtrasForFTB.png" #optional
+# A text field displayed in the mod UI
+credits="Thanks FTB team for making your mods"
+authors = "X_Niter"
+description = '''
+Extra quirks for the well known FTB Mods.
+'''
+
+# FORGE
+[[dependencies.extrasforftb]]
+modId = "forge"
+mandatory = true
+versionRange = "[40,)"
+ordering = "NONE"
+side = "BOTH"
+
+# MINECRAFT
+[[dependencies.extrasforftb]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.18.2,1.19)"
+ordering = "NONE"
+side = "BOTH"
+
+# FTB LIBRARY
+[[dependencies.extrasforftb]]
+modId = "ftblibrary"
+mandatory = true
+versionRange = "[1802.3.7-build.154,)"
+ordering = "NONE"
+side = "BOTH"
+
+# FTB RANKS
+[[dependencies.extrasforftb]]
+modId = "ftbranks"
+mandatory = false
+versionRange = "[1802.1.8-build.34,)"
+ordering = "AFTER"
+side = "SERVER"
+
+# FTB ESSENTIALS
+[[dependencies.extrasforftb]]
+modId = "ftbessentials"
+mandatory = false
+versionRange = "[1802.1.7-build.42,)"
+ordering = "AFTER"
+side = "SERVER"
+
+# FTB TEAMS
+[[dependencies.extrasforftb]]
+modId = "ftbteams"
+mandatory = false
+versionRange = "[1802.2.7-build.71,)"
+ordering = "AFTER"
+side = "BOTH"
+
+# FTB CHUNKS
+[[dependencies.extrasforftb]]
+modId = "ftbchunks"
+mandatory = false
+versionRange = "[1802.3.7-build.172,)"
+ordering = "AFTER"
+side = "BOTH"
+
+# LUCKPERMS
+[[dependencies.extrasforftb]]
+modId = "luckperms"
+mandatory = false
+versionRange = "[5.4.26,)"
+ordering = "AFTER"
+side = "SERVER"
