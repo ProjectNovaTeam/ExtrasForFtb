@@ -8,9 +8,19 @@
     "ftbessentials.config.ExtrasForFTBPermissionBasedIntValue",
     "ftbchunks.ExtrasForFTBChunksWorldConfig"
   ],
-  "client": [
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+  "server": [
+    "minecraft.vanishmixins.ExtrasForFtbServerPlayer",
+    "minecraft.vanishmixins.ExtrasForFtbServerGamePacketListenerImpl",
+    "minecraft.vanishmixins.ExtrasForFtbPlayerList",
+    "minecraft.vanishmixins.world.ExtrasForFtbTrackedEntity",
+    "minecraft.vanishmixins.world.ExtrasForFtbSleepStatus",
+    "minecraft.vanishmixins.world.ExtrasForFtbPlayer",
+    "minecraft.vanishmixins.world.ExtrasForFtbLivingEntity",
+    "minecraft.vanishmixins.gui.ExtrasForFtbServerStatusPacketListenerImpl",
+    "minecraft.vanishmixins.gui.ExtrasForFtbServerStatus",
+    "minecraft.vanishmixins.chat.ExtrasForFtbListPlayersCommand",
+    "minecraft.vanishmixins.chat.ExtrasForFtbEntitySelector",
+    "minecraft.vanishmixins.chat.ExtrasForFtbEntityArgument",
+    "minecraft.vanishmixins.chat.ExtrasForFtbCombatTracker"
+  ]
 }

@@ -21,6 +21,9 @@ import static dev.ftb.mods.ftbchunks.FTBChunksWorldConfig.*;
 @Mixin({FTBChunksWorldConfig.class})
 public interface ExtrasForFTBChunksWorldConfig {
 
+    // TODO: FTBRanksAPIImpl.manager.reload();
+    // TODO; Need to fire an FTB update when LP makes any permission changes to make sure FTB's mods is updated with LP changes.
+
     @Overwrite(remap = false)
     static int getMaxClaimedChunks(FTBChunksTeamData playerData, ServerPlayer player) {
         if (MainConfig.LP_INTEGRATION.isEnabled() && ExtrasForFTB.luckpermsMod && player != null) {
@@ -44,11 +47,11 @@ public interface ExtrasForFTBChunksWorldConfig {
     }
 
     @Overwrite(remap = false)
-    static boolean getChunkLoadOffline(ServerPlayer player) {
+    static boolean canPlayerOfflineForceload(ServerPlayer player) {
         if (MainConfig.LP_INTEGRATION.isEnabled() && ExtrasForFTB.luckpermsMod && player != null) {
-            return LuckPermsIntegration.getChunkLoadOffline(player, CHUNK_LOAD_OFFLINE.get());
+            return LuckPermsIntegration.getChunkLoadOffline(player, false);
         } else if (FTBChunks.ranksMod && player != null) {
-            return FTBRanksIntegration.getChunkLoadOffline(player, CHUNK_LOAD_OFFLINE.get());
+            return FTBRanksIntegration.getChunkLoadOffline(player, false);
         }
 
         return CHUNK_LOAD_OFFLINE.get();

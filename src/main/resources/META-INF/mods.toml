@@ -40,7 +40,7 @@ side = "BOTH"
 [[dependencies.extrasforftb]]
 modId = "ftblibrary"
 mandatory = true
-versionRange = "[1802.3.7-build.154,)"
+versionRange = "[1802.3,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -48,7 +48,7 @@ side = "BOTH"
 [[dependencies.extrasforftb]]
 modId = "ftbranks"
 mandatory = false
-versionRange = "[1802.1.8-build.34,)"
+versionRange = "[1802.1,)"
 ordering = "AFTER"
 side = "SERVER"
 
@@ -56,7 +56,7 @@ side = "SERVER"
 [[dependencies.extrasforftb]]
 modId = "ftbessentials"
 mandatory = false
-versionRange = "[1802.1.7-build.42,)"
+versionRange = "[1802.1,)"
 ordering = "AFTER"
 side = "SERVER"
 
@@ -64,7 +64,7 @@ side = "SERVER"
 [[dependencies.extrasforftb]]
 modId = "ftbteams"
 mandatory = false
-versionRange = "[1802.2.7-build.71,)"
+versionRange = "[1802.2,)"
 ordering = "AFTER"
 side = "BOTH"
 
@@ -72,7 +72,7 @@ side = "BOTH"
 [[dependencies.extrasforftb]]
 modId = "ftbchunks"
 mandatory = false
-versionRange = "[1802.3.7-build.172,)"
+versionRange = "[1802.3,)"
 ordering = "AFTER"
 side = "BOTH"
 

@@ -5,6 +5,8 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id "com.matthewprenger.cursegradle" version "1.4.0"
+    //id "org.spongepowered.mixin" version "0.7.+"
+    //id "org.parchmentmc.librarian.forgegradle" version "1.+"
 }
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = 17
@@ -15,6 +17,7 @@ group = rootProject.maven_group
 
 loom {
     silentMojangMappingsLicense()
+    //mappings channel: 'parchment', version: '2022.11.06-1.18.2'
 
     forge {
         mixinConfigs = ["ExtrasForFTB.mixins.json"]
@@ -59,6 +62,7 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     mappings loom.officialMojangMappings()
 
     forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
@@ -76,7 +80,7 @@ dependencies {
 
     modImplementation "dev.ftb.mods:ftb-teams-forge:${rootProject.ftb_teams_version}"
 
-    compileOnly 'net.luckperms:api:5.4'
+    modImplementation 'net.luckperms:api:5.4'
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

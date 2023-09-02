@@ -1,0 +1,92 @@
+package com.github.org.projectnova.extrasforftb.common.utils;
+
+import com.github.org.projectnova.extrasforftb.common.config.MainConfig;
+import com.mojang.authlib.GameProfile;
+import dev.ftb.mods.ftbteams.FTBTeamsAPI;
+import net.minecraft.server.level.ServerLevel;
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public class PlayerHistory {
+    List<String> month = new ArrayList<>();
+    List<String> week = new ArrayList<>();
+    List<String> day = new ArrayList<>();
+    List<String> playersInChunkClearTime = new ArrayList<>();
+    private static final long monthTime = 2629743;
+    private static final long weekTime = 604800;
+    private static final long dayTime = 86400;
+    private static final long CHUNK_CLEANER_TIMER = dayTime * MainConfig.FORCED_CHUNKS_EXPIRE_TIME.get();
+
+
+    public PlayerHistory(ServerLevel world) {
+        long current = Instant.now().getEpochSecond();
+        try {
+            Files.list(world.getServer().playerDataStorage.getPlayerDataFolder().toPath()).forEach(x -> {
+                if (x.toFile().isDirectory()
+                        || x.getFileName().toString().endsWith("old")
+                        || !x.getFileName().toString().endsWith("dat")) {
+                    return;
+                }
+                long fileTime = 0;
+                try {
+                    fileTime = Files.getLastModifiedTime(x, LinkOption.NOFOLLOW_LINKS).toInstant().getEpochSecond();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                long diff = current - fileTime;
+                if (diff < monthTime) {
+                    String uuidText = FilenameUtils.removeExtension(x.getFileName().toString());
+
+                    UUID uuid;
+                    try{
+                        uuid = UUID.fromString(uuidText);
+                    } catch (IllegalArgumentException ignored) {
+                        return;
+                    }
+
+                    Optional<GameProfile> profile = world.getServer().getProfileCache().get(uuid);
+                    if (profile.isEmpty()) return;
+                    String playerName = profile.get().getName();
+                    month.add(playerName);
+                    if (diff < weekTime) {
+                        week.add(playerName);
+                        if (diff < dayTime) {
+                            day.add(playerName);
+                        }
+                    }
+
+                    if(diff > CHUNK_CLEANER_TIMER)
+                        playersInChunkClearTime.add(playerName);
+
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public List<String> getMonth() {
+        return month;
+    }
+
+    public List<String> getWeek() {
+        return week;
+    }
+
+    public List<String> getDay() {
+        return day;
+    }
+
+    public List<String> getPlayersInChunkClearTime() {
+        return playersInChunkClearTime;
+    }
+}

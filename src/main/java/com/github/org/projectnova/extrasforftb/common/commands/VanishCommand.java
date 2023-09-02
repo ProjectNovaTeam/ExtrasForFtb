@@ -1,51 +1,56 @@
 package com.github.org.projectnova.extrasforftb.common.commands;
 
+import com.github.org.projectnova.extrasforftb.ExtrasForFTB;
 import com.github.org.projectnova.extrasforftb.common.config.MainConfig;
-import com.github.org.projectnova.extrasforftb.common.utils.MixinAccessor;
+import com.github.org.projectnova.extrasforftb.common.utils.VanishHelper;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.architectury.event.events.common.TickEvent;
-import dev.ftb.mods.ftbessentials.util.FTBEPlayerData;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
-import net.minecraft.server.level.ServerChunkCache;
-import net.minecraft.server.level.ServerEntity;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.*;
+import java.util.List;
 
 public class VanishCommand {
-    public static final Map<ServerPlayer, ServerEntity> trackers = new HashMap<>();
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("vanish")
+        ExtrasForFTB.LOGGER.info("Registering [/vanish] command");
+        List<String> vanishAliases = MainConfig.VANISH_ALIASES.get();
+        if (!vanishAliases.isEmpty()) {
+            vanishAliases.forEach(vAlias -> {
+                dispatcher.register(alias(vAlias));
+                ExtrasForFTB.LOGGER.info("Vanish command alias [/" + vAlias + "] registered.");
+            });
+        } else {
+            dispatcher.register(alias("vanish"));
+            ExtrasForFTB.LOGGER.info("Vanish command alias [/vanish] registered. If you want more aliases, please add them in the config.");
+        }
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> alias(String prefix) {
+        return Commands.literal(prefix)
                 .requires(MainConfig.VANISH.enabledAndOp())
                 .executes(context -> vanish(context, context.getSource().getPlayerOrException()))
                 .then(Commands.argument("player", EntityArgument.player())
                         .executes(context -> vanish(context, EntityArgument.getPlayer(context, "player")))
                 )
-        );
+                .then(Commands.literal("list")
+                        .executes(context -> listVanished(context, context.getSource().getPlayerOrException().getGameProfile().getName()))
+                );
     }
 
-    private static int vanish(CommandContext<CommandSourceStack> context, ServerPlayer serverPlayer) throws CommandSyntaxException {
+    private static int vanish(CommandContext<CommandSourceStack> ctx, ServerPlayer serverPlayer) {
 
-        if (serverPlayer == null) {
-            serverPlayer = context.getSource().getPlayerOrException();
-        }
+        VanishHelper.toggleVanish(serverPlayer);
 
-        String RUVanished = "";
-
-
-        Object asd = serverPlayer;
-        if (!((MixinAccessor) (Object) asd).vanished()) {
-            vanish(serverPlayer, true);
+        String RUVanished = "not";
+        if (VanishHelper.isVanished(serverPlayer)) {
             RUVanished = "now";
-        } else {
-            unvanish(serverPlayer);
+        } else if (!VanishHelper.isVanished(serverPlayer)) {
             RUVanished = "no longer";
         }
 
@@ -54,34 +59,23 @@ public class VanishCommand {
         return 1;
     }
 
-    public static void vanish(ServerPlayer player, boolean sendMsg) {
-        ((MixinAccessor) (Object) player).setVanished(true);
-        Objects.requireNonNull(player.getServer()).getPlayerList().broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, player));
-        ((ServerChunkCache) player.getCommandSenderWorld().getChunkSource()).removeEntity(player);
+    private static int listVanished(CommandContext<CommandSourceStack> context, String playerName) {
+        ServerPlayer serverPlayer = context.getSource().getServer().getPlayerList().getPlayerByName(playerName);
 
-        /*
-        if (player.getServer().isDedicatedServer() && sendMsg && MoreGameRules.get().checkBooleanWithPerm(player.getCommandSenderWorld().getGameRules(), MoreGameRules.get().doJoinMessageRule(), player))
-            Compat.get().broadcast(player.getServer().getPlayerList(), new Tuple<>(1, new ResourceLocation("system")), translatableText("multiplayer.player.left", player.getDisplayName())
-                    .withStyle(Style.EMPTY.applyFormat(ChatFormatting.YELLOW)).build());
-         */
-    }
+        if (serverPlayer != null) {
+            if (!VanishHelper.isVanished(serverPlayer))
+                vanish(context, serverPlayer);
+            else
+                context.getSource().sendFailure(new TranslatableComponent("Could not add already vanished player " + "%s to the vanishing queue", playerName));
 
-    public static void unvanish(ServerPlayer player) {
-        if (!((MixinAccessor) (Object) player).vanished()) {
-            return;
+            return 1;
         }
 
-        ((MixinAccessor) (Object) player).setVanished(false);
-        Objects.requireNonNull(player.getServer()).getPlayerList().broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, player));
-        trackers.remove(player);
-        ((ServerChunkCache) player.getCommandSenderWorld().getChunkSource()).addEntity(player);
+        if (VanishHelper.removeFromQueue(playerName))
+            context.getSource().sendSuccess(new TranslatableComponent("Removed " + "%s from the vanishing queue", playerName), true);
+        else if (VanishHelper.addToQueue(playerName))
+            context.getSource().sendSuccess(new TranslatableComponent("Added " + "%s to the vanishing queue", playerName), true);
 
-        /*
-        if (player.getServer().isDedicatedServer() && MoreGameRules.get().checkBooleanWithPerm(player.getCommandSenderWorld().getGameRules(), MoreGameRules.get().doJoinMessageRule(), player))
-            Compat.get().broadcast(player.getServer().getPlayerList(), new Tuple<>(1, new ResourceLocation("system")), translatableText("multiplayer.player.joined",
-                    player.getDisplayName())
-                    .withStyle(Style.EMPTY.applyFormat(ChatFormatting.YELLOW)).build());
-
-         */
+        return 1;
     }
 }
